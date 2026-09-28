@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    rect { fill: #151515; } text { fill: #f3f3f0; }
+    @media (prefers-color-scheme: dark) { rect { fill: #f3f3f0; } text { fill: #151515; } }
+  </style>
+  <rect width="64" height="64"/>
+  <text x="32" y="44" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="-1.5">AG</text>
+</svg>
