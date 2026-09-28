@@ -1,0 +1,23 @@
+/* Home only: the Graphite hero field. Slow steel tones with a faint orange glow,
+   drifting on their own and leaning toward the pointer. Loaded by index.html alone. */
+.hero__bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--page); }
+.hero__bg::after { content: ""; position: absolute; inset: auto 0 0; height: 22%; background: linear-gradient(180deg, rgba(255,255,255,0), var(--page)); }
+.blob { position: absolute; width: 62vmax; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 50%, var(--c) 0%, transparent 64%); opacity: 0.72; translate: calc(var(--mx, 0) * var(--k)) calc(var(--my, 0) * var(--k)); transition: translate 1.2s var(--ease); will-change: transform; }
+.blob--si { --c: #3b4454; --k: -26px; top: -30vmax; left: -18vmax; }        
+.blob--pearson { --c: #2c3546; --k: 34px; top: -22vmax; right: -24vmax; }  
+.blob--candle { --c: #ff5b23; --k: -18px; bottom: -26vmax; left: 4vmax; }    
+.blob--lime { --c: #474c55; --k: 22px; bottom: -26vmax; right: -10vmax; opacity: 0.6; } 
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .blob { opacity: 0; transition: opacity 2.2s ease, translate 1.2s var(--ease); }
+  .js.is-loaded .blob { opacity: 0.6; }
+  .js.is-loaded .blob--candle { opacity: 0.22; }
+  /* The colour fields drift on their own, slowly and out of phase */
+  .blob { animation: drift-a 26s ease-in-out infinite alternate; }
+  .blob--pearson { animation-name: drift-b; animation-duration: 31s; }
+  .blob--candle { animation-name: drift-c; animation-duration: 23s; }
+  .blob--lime { animation-name: drift-b; animation-duration: 35s; animation-direction: alternate-reverse; }
+  @keyframes drift-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(9vmax, 6vmax) scale(1.12); } }
+  @keyframes drift-b { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-10vmax, 7vmax) scale(0.94); } }
+  @keyframes drift-c { from { transform: translate(0, 0) scale(0.95); } to { transform: translate(7vmax, -8vmax) scale(1.1); } }
+}

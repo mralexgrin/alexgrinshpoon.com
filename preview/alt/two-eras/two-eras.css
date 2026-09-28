@@ -1,0 +1,35 @@
+/* Two eras: Now (designing with AI) leads; Before AI is the full archive, newest first. */
+.era-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 2rem; padding-bottom: 1rem; margin-bottom: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem); border-bottom: 1px solid var(--ink); }
+.era-head__title { font-size: var(--serif-m); }
+.era-head__title em { font-style: normal; color: var(--coral); }
+
+/* The new end to end, as one row of steps */
+.flow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-panel); overflow: hidden; margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem); }
+@media (min-width: 900px) { .flow { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.flow li { background: var(--page); padding: 1rem 1.1rem 1.2rem; display: grid; gap: 0.35rem; align-content: start; }
+.flow b { font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em; }
+.flow span { font-size: var(--step--1); color: var(--ink-2); line-height: 1.4; }
+.flow li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); margin-bottom: 0.4rem; }
+
+/* AI-era case studies */
+.now-grid { display: grid; gap: clamp(1.25rem, 0.75rem + 1.5vw, 2rem); }
+@media (min-width: 900px) { .now-grid { grid-template-columns: 1.4fr 1fr 1fr; } }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.35rem; }
+.chips li { font-size: 0.78rem; padding: 0.25rem 0.6rem; border: 1px solid var(--line-3); border-radius: 999px; color: var(--ink); }
+.slot { display: grid; align-content: space-between; gap: 1.5rem; min-height: 100%; padding: 1.25rem; border: 1px dashed var(--line-3); border-radius: var(--r-panel); color: var(--ink-2); }
+.slot__title { font-size: var(--serif-s); color: var(--ink); }
+.slot p { max-width: 26rem; }
+
+/* Before AI: the whole archive, newest first */
+.archive-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 1rem + 1vw, 2rem) clamp(0.75rem, 0.5rem + 1vw, 1.25rem); }
+@media (min-width: 900px) { .archive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.archive-grid .era-row { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.archive-grid .era-row:first-child { border-top: 0; padding-top: 0; }
+.era-row b { font-weight: 700; font-stretch: 112%; font-size: 1.1rem; }
+.era-row span { font-size: var(--step--1); color: var(--ink-2); }
+.mini { display: grid; gap: 0.6rem; text-decoration: none; color: inherit; }
+.mini .thumb { aspect-ratio: 4 / 3; border-radius: 6px; }
+.mini b { font-weight: 650; letter-spacing: -0.01em; line-height: 1.25; }
+.mini span { font-size: var(--step--1); color: var(--ink-2); }
+a.mini:hover b { text-decoration: underline; text-underline-offset: 0.15em; }
+a.mini:hover .thumb img { scale: 1.04; filter: none; }

@@ -3,3 +3,6 @@ Allow: /
 Disallow: /tools/
 
 Sitemap: https://mralexgrin.github.io/alexgrinshpoon.com/sitemap.xml
+User-agent: *
+Disallow: /alexgrinshpoon.com/preview/
+Disallow: /preview/
