@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /tools/
 
-Sitemap: https://alexgrinshpoon.com/sitemap.xml
+Sitemap: https://mralexgrin.github.io/alexgrinshpoon.com/sitemap.xml
