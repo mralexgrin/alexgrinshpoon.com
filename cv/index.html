@@ -4,117 +4,169 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alex Grinshpoon · CV</title>
+<meta name="description" content="Alex Grinshpoon, product design leader: twenty years across media, education and commerce, as a timeline.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/mona-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt; line-height: 1.4; color: #1a1a1a; max-width: 7.5in; margin: 0.5in auto; }
-  h1 { font-size: 22pt; margin: 0 0 2pt; }
-  .role { font-size: 12pt; margin: 0 0 4pt; }
-  .contact { font-size: 9.5pt; color: #444; margin: 0 0 14pt; }
-  h2 { font-size: 10pt; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid #999; padding-bottom: 2pt; margin: 16pt 0 6pt; }
-  h3 { font-size: 11pt; margin: 12pt 0 0; }
-  .meta { font-size: 9.5pt; color: #444; margin: 0 0 4pt; }
-  ul { margin: 2pt 0 0 0; padding-left: 16pt; }
-  li { margin: 0 0 3pt; }
-  p { margin: 0 0 6pt; }
+  @font-face { font-family: "Mona Sans"; src: url(/fonts/mona-sans-latin.woff2) format("woff2"); font-weight: 700 900; font-stretch: 110% 125%; font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url(/fonts/manrope-latin.woff2) format("woff2"); font-weight: 500 700; font-display: swap; }
+  :root { --ink: #111214; --ink-2: #4a4d52; --ink-3: #6b6e73; --line: #e2e2de; --soft: #f4f4f1; --accent: #ff5a1f; --gutter: clamp(20px, 4vw, 56px); }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  body { margin: 0; background: #fff; color: var(--ink); font: 500 16px/1.6 "Manrope", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--accent); color: #fff; }
   a { color: inherit; }
-  .top { display: flex; justify-content: space-between; gap: 16px; font-size: 10pt; margin: 0 0 18pt; }
-  .top a { color: #444; }
-  @media screen and (max-width: 8.5in) { body { margin: 24px 20px; } }
-  @media print { .top { display: none; } body { margin: 0 auto; } }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .d { font-family: "Mona Sans", system-ui, sans-serif; font-weight: 900; font-stretch: 125%; letter-spacing: -.035em; text-transform: uppercase; line-height: .9; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter); }
+
+  .bar { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; font-family: "Mona Sans", sans-serif; font-weight: 700; font-stretch: 110%; font-size: 15px; }
+  .bar a { text-decoration: none; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; }
+  .bar a:hover { color: var(--accent); }
+
+  header { padding: clamp(24px, 5vw, 64px) 0 36px; }
+  h1 { margin: 0; font-size: clamp(44px, 8vw, 120px); }
+  .role { margin: 16px 0 0; font-size: clamp(17px, 1.5vw, 21px); font-weight: 700; color: var(--ink-2); }
+
+  /* Vertical timeline */
+  .timeline { --date-w: clamp(120px, 16vw, 220px); position: relative; margin: 52px 0 0; padding: 0 0 72px; list-style: none; }
+  .timeline::before { content: ""; position: absolute; top: 10px; bottom: 80px; left: calc(var(--date-w) + 15px); width: 2px; background: var(--line); }
+  .entry { position: relative; display: grid; grid-template-columns: var(--date-w) 32px minmax(0, 1fr); padding-bottom: 52px; }
+  .entry__date { padding-top: 2px; font-size: clamp(28px, 3vw, 44px); text-align: right; font-variant-numeric: tabular-nums; }
+  .entry__date small { display: block; margin-top: 8px; font: 700 13px/1.2 "Manrope", sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+  .entry__dot { position: relative; }
+  .entry__dot::before { content: ""; position: absolute; top: 12px; left: 10px; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); }
+  .entry:first-child .entry__dot::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px rgb(255 90 31 / .18); }
+  .entry__body { padding-left: 14px; }
+  .co { margin: 0; font-size: clamp(26px, 2.6vw, 38px); }
+  .co small { display: block; margin-top: 8px; font: 700 14px/1.3 "Manrope", sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+  .title { margin: 10px 0 0; font-weight: 700; }
+  .title span { font-weight: 500; color: var(--ink-3); }
+  .entry ul { margin: 14px 0 0; padding-left: 18px; max-width: 70ch; color: var(--ink-2); }
+  .entry li { margin: 0 0 8px; }
+  .entry li::marker { color: var(--ink-3); }
+
+  @media (max-width: 760px) {
+    .timeline { --date-w: 0px; }
+    .timeline::before { left: 15px; }
+    .entry { grid-template-columns: 32px minmax(0, 1fr); }
+    .entry__date { grid-column: 2; grid-row: 1; text-align: left; padding: 0 0 10px 14px; font-size: 26px; }
+    .entry__date small { display: inline; margin-left: 8px; }
+    .entry__dot { grid-column: 1; grid-row: 1 / span 2; }
+    .entry__body { grid-column: 2; }
+  }
+  @media print {
+    @page { margin: 14mm 14mm; }
+    .bar { display: none; }
+    header { padding: 0 0 18px; }
+    h1 { font-size: 40px; }
+    .timeline { margin-top: 18px; padding-bottom: 0; }
+    .timeline::before { bottom: 0; }
+    .entry { break-inside: avoid; padding-bottom: 20px; }
+    body { font-size: 12.5px; }
+    .co { font-size: 22px; }
+    .entry__date { font-size: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 </style>
 </head>
 <body>
-<nav class="top"><a href="/">← alexgrinshpoon.com</a><a href="Alex-Grinshpoon-CV.pdf" download>Download PDF</a></nav>
+  <div class="wrap">
+    <nav class="bar" aria-label="Page"><a href="/">← Home</a><a href="Alex-Grinshpoon-CV.pdf" download>Download PDF</a></nav>
+    <header>
+      <h1 class="d">Alex Grinshpoon</h1>
+      <p class="role">Product Design Leader · New York</p>
+    </header>
+  </div>
 
-<h1>Alex Grinshpoon</h1>
-<p class="role"><b>Product Design Leader</b></p>
-<p class="contact">New York area · alexgrinshpoon.com · linkedin.com/in/alexgrinshpoon · gsasha21@gmail.com</p>
-
-<h2>Summary</h2>
-<p>I design products and lead the teams that build them. For about twenty years I've worked on direct-to-consumer, eCommerce and publishing products at Barnes &amp; Noble, Newell Brands, Pearson and now The Arena Group, home of Sports Illustrated and TheStreet. I set the direction, hire and grow designers, and still draw the flows and screens myself.</p>
-
-<h2>What I do best</h2>
-<ul>
-  <li><b>Hands-on product design.</b> User flows, wireframes, prototypes and production UI. I still work in the files.</li>
-  <li><b>Getting from a vague brief to a decision.</b> I write the brief, explore options side by side, and walk executives through the tradeoffs until we pick one.</li>
-  <li><b>Commerce and monetization.</b> Checkout, subscriptions, metered paywalls, in-article purchase and ad-supported templates.</li>
-  <li><b>Design systems</b> that hold up across many brands and many teams.</li>
-  <li><b>Research and testing.</b> I set up user research and A/B testing programs and feed what we learn back into the roadmap.</li>
-  <li><b>Building teams.</b> I hire, mentor and run multidisciplinary design teams of 8 to 10+ people.</li>
-</ul>
-
-<h2>Experience</h2>
-
-<h3>The Arena Group</h3>
-<p class="meta"><b>VP, Product Design</b> (previously Principal Product Designer) · New York, NY · 2021 – Present</p>
-<ul>
-  <li>Lead product design for the publishing and monetization platform behind Sports Illustrated, TheStreet, Parade and a group of lifestyle titles. That covers the editorial tools, reader experiences and revenue surfaces every publication shares.</li>
-  <li>Designed new Sports Illustrated templates that carry big photography, live scores, betting data and direct and programmatic ads on the same page. They're mobile first and run on our in-house CMS.</li>
-  <li>Designed the subscription path inside the story, from free reading to a metered offer and in-article purchase.</li>
-  <li>Built a hub-page framework for big events, starting with March Madness and the 2022 NFL Draft. Each event became a measurable audience that ad sales could package across the network.</li>
-  <li>Designed team and game pages on Sportradar data, plus a new article page built around the photograph.</li>
-  <li>Run the user research and testing programs that feed the product roadmap.</li>
-  <li>Rebuilt how I work around AI. I set the direction and make the calls, while AI agents draft PRDs, explore design directions in parallel, review accessibility and copy, and build working prototypes. In 2026 I took Scout, a creator-discovery tool, from idea to a working prototype this way.</li>
-</ul>
-
-<h3>Pearson</h3>
-<p class="meta"><b>VP, Product Design</b> · Hoboken, NJ · 2019 – 2021</p>
-<ul>
-  <li>Led the eCommerce and Higher Ed design teams, with 10+ designers across disciplines.</li>
-  <li><b>Pearson.com "Reimagine" (2020):</b> led product design and strategy for a new, personal front door for students and working professionals. The work included a rebuilt store flow from category to checkout, a video-based learning app, and a design language that later products were built on.</li>
-  <li><b>Pearson+:</b> wrote the brief for the product and brand direction and drew the user flows and wireframes myself. I hired a small agency for a holiday push so leadership had concepts ready at the start of the year, then took four style concepts to the executive team with the pros and cons of each. The one they chose set the look of the product and its marketing.</li>
-  <li>Kept leading Pearson+ when the strategy shifted to a direct-to-student eText subscription, which let Pearson reach students directly instead of through their instructors. Both the app and the website shipped.</li>
-</ul>
-
-<h3>Newell Brands</h3>
-<p class="meta"><b>Director, Product Design</b> · Hoboken, NJ · 2017 – 2019</p>
-<ul>
-  <li>Led eCommerce design and direct-to-consumer product strategy for Yankee Candle, Graco, Marmot, Parker and other consumer brands, reporting to the COO.</li>
-  <li>Started the UX practice in the eCommerce division and grew it to 10 people: information architects, interaction and UI designers, and an accessibility specialist.</li>
-  <li>Introduced New Stack, an atomic design system for building digital products across the brands.</li>
-  <li>Set up the testing and optimization group, running A/B and multivariate tests in Optimizely and Google Analytics.</li>
-  <li>Started a consumer insights research program that shaped the brand sites while direct-to-consumer online sales grew to $350M.</li>
-  <li>Brought design work in-house, which cut agency spend by 35%.</li>
-  <li>Hands-on work included Yankee Candle product pages, a build-your-own candle configurator and checkout; in-store kiosk apps and a SoHo pop-up for Yankee Candle's Candle Power campaign; and Parker's eCommerce site and homepage concepts.</li>
-</ul>
-
-<h3>Barnes &amp; Noble</h3>
-<p class="meta"><b>Group Art Director, eCommerce</b> · New York, NY · 2014 – 2017</p>
-<ul>
-  <li>Led design for BN.com across desktop, mobile web, apps and in-store kiosks. I managed and mentored 8 UX, UI and visual designers.</li>
-  <li>Led the 2017 BN.com redesign, which covered the homepage, the book discovery pages and the design system behind them.</li>
-  <li>Product lead and art director for B&amp;N mobile web, covering product pages, browsing and every step of checkout on a small screen.</li>
-  <li>Ran the A/B testing program. I wrote the hypotheses and KPIs, oversaw the design and got the winning versions into production.</li>
-  <li>Set cross-platform UX standards and built a toolkit for designers, the brand team and developers.</li>
-</ul>
-
-<h3>WayBetter (DietBet)</h3>
-<p class="meta"><b>Director, UX Strategy &amp; Design</b> · New York, NY · 2012 – 2014</p>
-<ul>
-  <li>Product and UX lead on two social games, including DietBet, and took both out of beta.</li>
-  <li>Designed the in-game experience and the social rewards economy behind more than $7.5M in first-year revenue.</li>
-  <li>Designed and prototyped the iOS and Android apps and built demos for the board and investors.</li>
-</ul>
-
-<h3>Barnes &amp; Noble, NOOK</h3>
-<p class="meta"><b>Lead Interactive Designer</b> · New York, NY · 2010 – 2012</p>
-<ul>
-  <li>Lead interaction designer on the NOOK HD tablet, covering the Apps, Newsstand, Shop and Books storefronts, search, cart and checkout.</li>
-  <li>Part of the team that launched the second-generation Android-based NOOK tablets.</li>
-  <li>Ran usability sessions with customers, built interactive prototypes, and wrote the flows and documentation for engineering.</li>
-</ul>
-
-<h3>Ember Media</h3>
-<p class="meta"><b>Creative Manager</b> (2007 – 2010) · <b>Senior Designer</b> (2005 – 2007) · New York, NY</p>
-<ul>
-  <li>Ran the design studio and led designers and developers on interactive TV, mobile and web projects for Scholastic, MTV, Discovery, Animal Planet, Mobile ESPN and Cablevision.</li>
-</ul>
-
-<h2>Education</h2>
-<p><b>BFA, Computer Design</b> · New York Institute of Technology · 2005</p>
-
-<h2>Tools</h2>
-<p>Figma, prototyping, Optimizely, Google Analytics, Claude Code and AI agent workflows</p>
+  <main class="wrap">
+    <ol class="timeline" aria-label="Experience, newest first">
+      <li class="entry" id="paradium">
+        <div class="entry__date d">2021<small>to present</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Paradium AI<small>formerly The Arena Group</small></h2>
+          <p class="title">VP, Product Design <span>(previously Principal Product Designer)</span></p>
+          <ul>
+            <li>Lead product design for the publishing and monetization platform behind Sports Illustrated, TheStreet, Parade and a group of lifestyle titles.</li>
+            <li>Designed new Sports Illustrated templates and the subscription path inside the story, from free reading to a metered offer and in-article purchase.</li>
+            <li>Rebuilt how I work around AI, with agents drafting PRDs, exploring directions and building prototypes; took Scout from idea to a working prototype this way in 2026.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="pearson">
+        <div class="entry__date d">2019<small>to 2021</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Pearson</h2>
+          <p class="title">VP, Product Design</p>
+          <ul>
+            <li>Led the eCommerce and Higher Ed design teams, with 10+ designers across disciplines.</li>
+            <li>Led product design and strategy for Pearson.com "Reimagine": a rebuilt store flow, a video-based learning app and a design language later products were built on.</li>
+            <li>Wrote the Pearson+ brief and drew its flows, then led it through the shift to a direct-to-student eText subscription. Both the app and the website shipped.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="newell">
+        <div class="entry__date d">2017<small>to 2019</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Newell Brands</h2>
+          <p class="title">Director, Product Design</p>
+          <ul>
+            <li>Led eCommerce design and direct-to-consumer strategy for Yankee Candle, Graco, Marmot, Parker and other brands, reporting to the COO.</li>
+            <li>Started the eCommerce UX practice, grew it to 10 people, and introduced New Stack, an atomic design system across the brands.</li>
+            <li>Set up testing and consumer insights programs while direct-to-consumer online sales grew to $350M, and cut agency spend by 35% by bringing design in-house.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="bn">
+        <div class="entry__date d">2014<small>to 2017</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Barnes &amp; Noble</h2>
+          <p class="title">Group Art Director, eCommerce</p>
+          <ul>
+            <li>Led design for BN.com across desktop, mobile web, apps and in-store kiosks, managing and mentoring 8 designers.</li>
+            <li>Led the 2017 BN.com redesign: the homepage, the book discovery pages and the design system behind them.</li>
+            <li>Ran the A/B testing program, from hypotheses and KPIs to getting the winning versions into production.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="waybetter">
+        <div class="entry__date d">2012<small>to 2014</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">WayBetter</h2>
+          <p class="title">Director, UX Strategy &amp; Design <span>(DietBet)</span></p>
+          <ul>
+            <li>Product and UX lead on two social games, including DietBet, and took both out of beta.</li>
+            <li>Designed the in-game experience and the social rewards economy behind more than $7.5M in first-year revenue.</li>
+            <li>Designed and prototyped the iOS and Android apps and built demos for the board and investors.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="nook">
+        <div class="entry__date d">2010<small>to 2012</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Barnes &amp; Noble, NOOK</h2>
+          <p class="title">Lead Interactive Designer</p>
+          <ul>
+            <li>Lead interaction designer on the NOOK HD tablet, covering the Apps, Newsstand, Shop and Books storefronts, search, cart and checkout.</li>
+            <li>Part of the team that launched the second-generation Android-based NOOK tablets.</li>
+            <li>Ran usability sessions with customers, built interactive prototypes, and wrote the flows and documentation for engineering.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="ember">
+        <div class="entry__date d">2005<small>to 2010</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Ember Media</h2>
+          <p class="title">Creative Manager <span>(2007 – 2010)</span> · Senior Designer <span>(2005 – 2007)</span></p>
+          <ul>
+            <li>Ran the design studio, promoted from Senior Designer to Creative Manager in 2007.</li>
+            <li>Led designers and developers on interactive TV, mobile and web projects.</li>
+            <li>Clients included Scholastic, MTV, Discovery, Animal Planet, Mobile ESPN and Cablevision.</li>
+          </ul>
+        </div>
+      </li>
+    </ol>
+  </main>
 
 </body>
 </html>
