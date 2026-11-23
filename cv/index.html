@@ -45,6 +45,11 @@
   .entry ul { margin: 14px 0 0; padding-left: 18px; max-width: 70ch; color: var(--ink-2); }
   .entry li { margin: 0 0 8px; }
   .entry li::marker { color: var(--ink-3); }
+  /* Three phases of the current role, in order */
+  .phases { display: grid; gap: 14px; margin: 16px 0 0; padding: 0; max-width: 70ch; list-style: none; counter-reset: phase; color: var(--ink-2); }
+  .phases li { position: relative; margin: 0; padding-left: 34px; counter-increment: phase; }
+  .phases li::before { content: counter(phase); position: absolute; left: 0; top: 1px; display: grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 50%; font: 700 12px/1 "Mona Sans", sans-serif; font-stretch: 110%; color: var(--ink); }
+  .phases b { color: var(--ink); }
 
   @media (max-width: 760px) {
     .timeline { --date-w: 0px; }
@@ -86,11 +91,11 @@
         <div class="entry__body">
           <h2 class="co d">Paradium AI<small>formerly The Arena Group</small></h2>
           <p class="title">VP, Product Design <span>(previously Principal Product Designer)</span></p>
-          <ul>
-            <li>Lead product design for the publishing and monetization platform behind Sports Illustrated, TheStreet, Parade and a group of lifestyle titles.</li>
-            <li>Designed new Sports Illustrated templates and the subscription path inside the story, from free reading to a metered offer and in-article purchase.</li>
-            <li>Rebuilt how I work around AI, with agents drafting PRDs, exploring directions and building prototypes; took Scout from idea to a working prototype this way in 2026.</li>
-          </ul>
+          <ol class="phases">
+            <li><b>Core products.</b> Shaped the core product experience of Sports Illustrated, Parade and TheStreet, including their apps. Helped grow the subscription business and supported the direct sales team and seasonal campaigns.</li>
+            <li><b>Platform transformation.</b> Managed the agencies that designed, built and migrated all of our websites to a new content management system. Modernized the front end and brought in comments, games and other engagement features to strengthen community.</li>
+            <li><b>Creator tools.</b> Supporting the company's shift to a creator-focused business, designing tools for content production, including Cutter, and social video experiences.</li>
+          </ol>
         </div>
       </li>
       <li class="entry" id="pearson">
