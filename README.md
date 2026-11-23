@@ -1,3 +1,4 @@
 # alexgrinshpoon.com
 
-Published site. Built from a private source repo; do not edit here.
+Temporary placeholder served by GitHub Pages at https://alexgrinshpoon.com while the new portfolio is built.
+The previous build is in the git history (commit before "Replace site with placeholder").
