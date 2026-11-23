@@ -13,17 +13,17 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@100..125,400..900&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500..700&family=Mona+Sans:wdth,wght@100..125,400..900&family=Manrope:wght@400..800&display=swap">
   <style>
     :root {
       color-scheme: light;
       --page: #ffffff; --ink: #111214; --ink-2: #44474c; --ink-3: #62656a;
-      --line: #e3e3e0; --soft: #f4f4f1; --accent: #ff5a1f; --gutter: 32px;
+      --line: #e3e3e0; --accent: #ff5a1f; --accent-ink: #d63f08; --gutter: 32px;
       --f-display: "Mona Sans", system-ui, sans-serif;
       --f-ui: "Manrope", system-ui, sans-serif;
+      --f-hand: "Caveat", "Bradley Hand", cursive;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
       margin: 0; display: flex; flex-direction: column; min-height: 100svh;
       background: var(--page); color: var(--ink);
@@ -33,26 +33,45 @@
     .bar { display: flex; align-items: center; height: 76px; padding: 0 var(--gutter); }
     .logo { display: inline-flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: 20px; font-weight: 900; font-stretch: 125%; text-transform: uppercase; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
     .logo__dot { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); flex: none; }
-    main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 28px; padding: 40px var(--gutter) 64px; max-width: 1600px; width: 100%; margin: 0 auto; }
-    .status { display: inline-flex; align-items: center; gap: 8px; align-self: start; padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
-    .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 32px var(--gutter) 64px; max-width: 1600px; width: 100%; margin: 0 auto; }
+
+    /* Handwritten hello, with a pen arrow down into the headline */
+    .hello { display: flex; align-items: flex-end; gap: 6px; margin: 0 0 6px 4px; font-family: var(--f-hand); font-weight: 600; font-size: clamp(28px, 3vw, 40px); line-height: 1; color: var(--accent-ink); transform: rotate(-3deg); transform-origin: left bottom; }
+    .hello svg { width: clamp(40px, 4vw, 56px); height: auto; margin-bottom: -18px; overflow: visible; }
+
     h1 { margin: 0; font-family: var(--f-display); font-weight: 800; font-stretch: 115%; letter-spacing: -0.03em; font-size: clamp(40px, 7vw, 112px); line-height: .98; max-width: 16ch; text-wrap: balance; }
-    h1 em { font-style: normal; color: var(--accent); }
-    p { margin: 0; font-size: clamp(16px, 1.4vw, 20px); color: var(--ink-2); max-width: 46ch; text-wrap: pretty; }
-    p b { color: var(--ink); font-weight: 700; }
-    .btn { display: inline-flex; align-items: center; gap: 10px; align-self: start; padding: 13px 20px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 600; transition: background .2s, transform .2s; }
-    .btn:hover { background: #2a2c30; }
-    .btn:active { transform: scale(.97); }
-    .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-    .btn svg { width: 16px; height: 16px; transition: transform .3s cubic-bezier(.2, .7, .2, 1); }
-    .btn:hover svg { transform: translate(2px, -2px); }
+    .mark { position: relative; display: inline-block; white-space: nowrap; }
+    .mark svg { position: absolute; left: -3%; bottom: -.2em; width: 106%; height: .34em; overflow: visible; }
+
+    .lede { margin: 32px 0 0; font-size: clamp(16px, 1.4vw, 20px); color: var(--ink-2); max-width: 46ch; text-wrap: pretty; }
+    .lede b { color: var(--ink); font-weight: 700; }
+
+    /* Links: plain words, no pills */
+    .links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 36px; margin: 36px 0 0; padding: 0; list-style: none; }
+    .links a { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-display); font-weight: 750; font-stretch: 110%; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -.02em; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; text-decoration-color: var(--line); transition: color .2s, text-decoration-color .2s; }
+    .links a:hover { color: var(--accent-ink); text-decoration-color: currentColor; }
+    .links a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    .links svg { width: .7em; height: .7em; transition: transform .3s cubic-bezier(.2, .7, .2, 1); }
+    .links a:hover svg { transform: translate(2px, -2px); }
+
+    .aside { display: flex; align-items: flex-start; gap: 4px; margin: 22px 0 0; font-family: var(--f-hand); font-weight: 500; font-size: clamp(24px, 2.2vw, 30px); line-height: 1.1; color: var(--ink-2); transform: rotate(-1.5deg); transform-origin: left; }
+    .aside svg { width: 44px; height: auto; flex: none; margin-top: -14px; overflow: visible; }
+
     footer { padding: 24px var(--gutter); font-size: 14px; color: var(--ink-3); }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    .pen { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+    .mark .pen { stroke: var(--accent); stroke-width: 6; }
+
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+    @keyframes draw { from { stroke-dashoffset: 1; } }
     @media (prefers-reduced-motion: no-preference) {
       main > * { animation: rise .8s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--n, 0) * 90ms); }
+      .hello, .aside { animation-name: rise; }
+      .pen { stroke-dasharray: 1; animation: draw .9s cubic-bezier(.6, 0, .3, 1) both; animation-delay: calc(var(--d, 0) * 1ms); }
     }
-    @media (max-width: 560px) { :root { --gutter: 16px; } .logo { font-size: 17px; } }
+    @media (max-width: 560px) { :root { --gutter: 20px; } .logo { font-size: 17px; } }
   </style>
 </head>
 <body>
@@ -60,10 +79,19 @@
     <a class="logo" href="/" aria-label="Alex Grinshpoon, home"><span class="logo__dot" aria-hidden="true"></span>Alex Grinshpoon</a>
   </header>
   <main>
-    <span class="status" style="--n:0">New portfolio in progress</span>
-    <h1 style="--n:1">I set product strategy, and still design the work that <em>ships.</em></h1>
-    <p style="--n:2"><b>Alex Grinshpoon</b>, VP of Product Design at The Arena Group. Two decades across media, education, and commerce. The full portfolio is coming soon.</p>
-    <a class="btn" style="--n:3" href="https://www.linkedin.com/in/alexgrinshpoon" target="_blank" rel="noopener">Say hello on LinkedIn<span class="sr-only"> (opens in a new tab)</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+    <p class="hello" style="--n:0">hi, I'm Alex
+      <svg viewBox="0 0 56 48" aria-hidden="true"><path class="pen" pathLength="1" style="--d:500" stroke-width="2.5" d="M4 6 C 26 4, 44 14, 46 40"/><path class="pen" pathLength="1" style="--d:1100" stroke-width="2.5" d="M37 32 L 46 41 L 52 30"/></svg>
+    </p>
+    <h1 style="--n:1">I set product strategy, and still design the work that <span class="mark">ships.<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="pen" pathLength="1" style="--d:700" vector-effect="non-scaling-stroke" d="M3 13 C 38 6, 74 15, 112 9 S 170 5, 197 11"/></svg></span></h1>
+    <p class="lede" style="--n:2"><b>VP of Product Design</b> at The Arena Group, home of Sports Illustrated and TheStreet. Two decades of product design across media, education, and commerce.</p>
+    <ul class="links" style="--n:3">
+      <li><a href="/cv/">My CV<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+      <li><a href="https://www.linkedin.com/in/alexgrinshpoon" target="_blank" rel="noopener">LinkedIn<span class="sr-only"> (opens in a new tab)</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a></li>
+    </ul>
+    <p class="aside" style="--n:4">
+      <svg viewBox="0 0 44 36" aria-hidden="true"><path class="pen" pathLength="1" style="--d:1300" stroke-width="2.2" d="M36 32 C 14 30, 6 20, 10 4"/><path class="pen" pathLength="1" style="--d:1800" stroke-width="2.2" d="M3 11 L 10 3 L 17 10"/></svg>
+      the full portfolio is on its way. promise.
+    </p>
   </main>
   <footer>© 2026 Alex Grinshpoon</footer>
 </body>
