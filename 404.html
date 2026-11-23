@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alex Grinshpoon · Product Design</title>
+  <meta name="description" content="Alex Grinshpoon, VP of Product Design at Paradium AI, formerly The Arena Group. New portfolio on its way.">
+  <link rel="canonical" href="https://alexgrinshpoon.com/">
+  <meta property="og:title" content="Alex Grinshpoon · Product Design">
+  <meta property="og:description" content="VP of Product Design at Paradium AI, formerly The Arena Group. New portfolio on its way.">
+  <meta property="og:url" content="https://alexgrinshpoon.com/">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/mona-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/img/alex-portrait-blur.jpg" as="image">
+  <style>
+    /* Self-hosted latin subsets (OFL): Mona Sans 110-125% width, 700-900 weight; Manrope 500-700 */
+    @font-face { font-family: "Mona Sans"; src: url(/fonts/mona-sans-latin.woff2) format("woff2"); font-weight: 700 900; font-stretch: 110% 125%; font-display: swap; }
+    @font-face { font-family: "Manrope"; src: url(/fonts/manrope-latin.woff2) format("woff2"); font-weight: 500 700; font-display: swap; }
+
+    :root { color-scheme: light; --ink: #111214; --ink-2: #4a4d52; --page: #ffffff; --accent: #ff5a1f; --gutter: clamp(20px, 3vw, 44px); }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body { min-height: 100%; margin: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding: var(--gutter); overflow-x: hidden; background: var(--page); color: var(--ink); font: 500 15px/1.5 "Manrope", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: #fff; }
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px 24px; color: var(--ink-2); }
+    .top p { margin: 0; max-width: 46ch; }
+
+    /* Two buttons: CV solid, LinkedIn outlined */
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .links a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); font: 700 15px/1 "Mona Sans", system-ui, sans-serif; font-stretch: 110%; text-decoration: none; transition: background-color .2s, color .2s, border-color .2s; }
+    .links a:hover { background: var(--ink); color: #fff; }
+    .links a.btn-solid { background: var(--ink); color: #fff; }
+    .links a.btn-solid:hover { background: #33363b; border-color: #33363b; }
+    .links svg { width: 14px; height: 14px; flex: none; }
+
+    /* The name fills the width; a soft-focus portrait drifts inside the letters */
+    h1 { margin: 0; font-family: "Mona Sans", system-ui, sans-serif; font-weight: 900; font-stretch: 125%; text-transform: uppercase; letter-spacing: -.045em; line-height: .84; font-size: 12.6vw;
+         color: var(--ink);
+         background: linear-gradient(rgb(17 18 20 / .28), rgb(17 18 20 / .28)), url(/img/alex-portrait-blur.jpg) 0% 40% / 115vw auto;
+         -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+         animation: pan 34s ease-in-out infinite alternate; }
+    @keyframes pan { to { background-position: 0 0, 100% 60%; } }
+    h1 span { display: block; }
+    h1 { overflow: clip; overflow-clip-margin: .04em; }
+    h1 span:first-child { font-size: min(2.47em, 58vh); }
+
+    @media (max-width: 760px) { .top { flex-direction: column; } h1 { font-size: 11.6vw; } }
+    @media (prefers-reduced-motion: reduce) { h1 { animation: none; } .links a { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <p>VP of Product Design at Paradium AI, formerly The Arena Group. The new portfolio is on its way. Until then, please enjoy my name, really big.</p>
+    <ul class="links">
+      <li><a class="btn-solid" href="/cv/">View CV</a></li>
+      <li><a href="https://www.linkedin.com/in/alexgrinshpoon" target="_blank" rel="noopener">LinkedIn<span class="sr-only"> (opens in a new tab)</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+    </ul>
+  </div>
+  <h1><span>Alex</span><span>Grinshpoon</span></h1>
+</body>
+</html>
