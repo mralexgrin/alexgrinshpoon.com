@@ -35,7 +35,7 @@
   .entry__date { padding-top: 2px; font-size: clamp(28px, 3vw, 44px); text-align: right; font-variant-numeric: tabular-nums; }
   .entry__date small { display: block; margin-top: 8px; font: 700 13px/1.2 "Manrope", sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
   .entry__dot { position: relative; }
-  .entry__dot::before { content: ""; position: absolute; top: 12px; left: 10px; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); }
+  .entry__dot::before { content: ""; position: absolute; top: 12px; left: 50%; translate: -50% 0; box-sizing: border-box; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); }
   .entry:first-child .entry__dot::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px rgb(255 90 31 / .18); }
   .entry__body { padding-left: 14px; }
   .co { margin: 0; font-size: clamp(26px, 2.6vw, 38px); }
@@ -45,11 +45,7 @@
   .entry ul { margin: 14px 0 0; padding-left: 18px; max-width: 70ch; color: var(--ink-2); }
   .entry li { margin: 0 0 8px; }
   .entry li::marker { color: var(--ink-3); }
-  /* Three phases of the current role, in order */
-  .phases { display: grid; gap: 14px; margin: 16px 0 0; padding: 0; max-width: 70ch; list-style: none; counter-reset: phase; color: var(--ink-2); }
-  .phases li { position: relative; margin: 0; padding-left: 34px; counter-increment: phase; }
-  .phases li::before { content: counter(phase); position: absolute; left: 0; top: 1px; display: grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 50%; font: 700 12px/1 "Mona Sans", sans-serif; font-stretch: 110%; color: var(--ink); }
-  .phases b { color: var(--ink); }
+  .entry li b { color: var(--ink); }
 
   @media (max-width: 760px) {
     .timeline { --date-w: 0px; }
@@ -67,7 +63,8 @@
     h1 { font-size: 40px; }
     .timeline { margin-top: 18px; padding-bottom: 0; }
     .timeline::before { bottom: 0; }
-    .entry { break-inside: avoid; padding-bottom: 20px; }
+    .entry { break-inside: avoid; padding-bottom: 14px; }
+    .entry ul { margin-top: 8px; } .entry li { margin-bottom: 3px; } .title { margin-top: 6px; } .co small { margin-top: 4px; }
     body { font-size: 12.5px; }
     .co { font-size: 22px; }
     .entry__date { font-size: 24px; }
@@ -90,12 +87,12 @@
         <div class="entry__date d">2021<small>to present</small></div><div class="entry__dot" aria-hidden="true"></div>
         <div class="entry__body">
           <h2 class="co d">Paradium AI<small>formerly The Arena Group</small></h2>
-          <p class="title">VP, Product Design <span>(previously Principal Product Designer)</span></p>
-          <ol class="phases">
-            <li><b>Core products.</b> Shaped the core product experience of Sports Illustrated, Parade and TheStreet, including their apps. Helped grow the subscription business and supported the direct sales team and seasonal campaigns.</li>
-            <li><b>Platform transformation.</b> Managed the agencies that designed, built and migrated all of our websites to a new content management system. Modernized the front end and brought in comments, games and other engagement features to strengthen community.</li>
-            <li><b>Creator tools.</b> Supporting the company's shift to a creator-focused business, designing tools for content production, including Cutter, and social video experiences.</li>
-          </ol>
+          <p class="title">VP, Product Design</p>
+          <ul>
+            <li><b>Core products.</b> Lead design for Sports Illustrated, Parade and TheStreet, on the web and in their apps. Designed the path from free reading to a paid subscription inside the story, and event hubs like March Madness that ad sales could sell across the network.</li>
+            <li><b>New platform.</b> Led the agencies that redesigned every site and moved them all onto one new content system. Added comments, games and other features that bring readers back.</li>
+            <li><b>Creator tools.</b> Now leading design as the company turns toward creators, from content tools like Cutter to social video.</li>
+          </ul>
         </div>
       </li>
       <li class="entry" id="pearson">
@@ -104,9 +101,9 @@
           <h2 class="co d">Pearson</h2>
           <p class="title">VP, Product Design</p>
           <ul>
-            <li>Led the eCommerce and Higher Ed design teams, with 10+ designers across disciplines.</li>
-            <li>Led product design and strategy for Pearson.com "Reimagine": a rebuilt store flow, a video-based learning app and a design language later products were built on.</li>
-            <li>Wrote the Pearson+ brief and drew its flows, then led it through the shift to a direct-to-student eText subscription. Both the app and the website shipped.</li>
+            <li><b>Led 10+ designers</b> across the eCommerce and Higher Ed teams.</li>
+            <li><b>Pearson.com redesign.</b> Led design and strategy for a new front door for students: a rebuilt store from browsing to checkout, a video learning app, and a design language later products were built on.</li>
+            <li><b>Pearson+, from brief to launch.</b> Wrote the brief, drew the flows, and took four directions to the executive team. Then led it through the move to an eText subscription sold straight to students. The app and website both shipped.</li>
           </ul>
         </div>
       </li>
@@ -116,9 +113,9 @@
           <h2 class="co d">Newell Brands</h2>
           <p class="title">Director, Product Design</p>
           <ul>
-            <li>Led eCommerce design and direct-to-consumer strategy for Yankee Candle, Graco, Marmot, Parker and other brands, reporting to the COO.</li>
-            <li>Started the eCommerce UX practice, grew it to 10 people, and introduced New Stack, an atomic design system across the brands.</li>
-            <li>Set up testing and consumer insights programs while direct-to-consumer online sales grew to $350M, and cut agency spend by 35% by bringing design in-house.</li>
+            <li><b>Built the UX team</b> from scratch to 10 people, reporting to the COO, for Yankee Candle, Graco, Marmot, Parker and other brands.</li>
+            <li><b>New Stack.</b> Introduced one design system and front end for every brand, and moved more than 120 brands onto it.</li>
+            <li><b>$350M in online sales.</b> Set up testing and customer research as direct sales grew to $350M, and cut agency costs by 35% by bringing design in-house.</li>
           </ul>
         </div>
       </li>
@@ -128,9 +125,9 @@
           <h2 class="co d">Barnes &amp; Noble</h2>
           <p class="title">Group Art Director, eCommerce</p>
           <ul>
-            <li>Led design for BN.com across desktop, mobile web, apps and in-store kiosks, managing and mentoring 8 designers.</li>
-            <li>Led the 2017 BN.com redesign: the homepage, the book discovery pages and the design system behind them.</li>
-            <li>Ran the A/B testing program, from hypotheses and KPIs to getting the winning versions into production.</li>
+            <li><b>Led a team of 8</b> designers across BN.com on desktop, mobile, apps and in-store kiosks.</li>
+            <li><b>The 2017 BN.com redesign.</b> Led the new homepage, the pages for finding books, and the design system behind them.</li>
+            <li><b>Testing that shipped.</b> Ran the A/B testing program, from the first idea to getting the winners live.</li>
           </ul>
         </div>
       </li>
@@ -140,9 +137,9 @@
           <h2 class="co d">WayBetter</h2>
           <p class="title">Director, UX Strategy &amp; Design <span>(DietBet)</span></p>
           <ul>
-            <li>Product and UX lead on two social games, including DietBet, and took both out of beta.</li>
-            <li>Designed the in-game experience and the social rewards economy behind more than $7.5M in first-year revenue.</li>
-            <li>Designed and prototyped the iOS and Android apps and built demos for the board and investors.</li>
+            <li><b>Led product and UX</b> on two social games, including DietBet, and took both out of beta.</li>
+            <li><b>$7.5M in year one.</b> Designed DietBet's game and social rewards, which brought in more than $7.5M in first-year revenue.</li>
+            <li><b>iOS and Android.</b> Designed and prototyped the apps, and built the demos for the board and investors.</li>
           </ul>
         </div>
       </li>
@@ -152,9 +149,9 @@
           <h2 class="co d">Barnes &amp; Noble, NOOK</h2>
           <p class="title">Lead Interactive Designer</p>
           <ul>
-            <li>Lead interaction designer on the NOOK HD tablet, covering the Apps, Newsstand, Shop and Books storefronts, search, cart and checkout.</li>
-            <li>Part of the team that launched the second-generation Android-based NOOK tablets.</li>
-            <li>Ran usability sessions with customers, built interactive prototypes, and wrote the flows and documentation for engineering.</li>
+            <li><b>NOOK HD.</b> Lead designer for the tablet's stores for apps, books and magazines, plus search, cart and checkout.</li>
+            <li><b>Launched</b> the second generation of NOOK tablets.</li>
+            <li><b>Tested with customers,</b> built prototypes, and wrote the flows engineers built from.</li>
           </ul>
         </div>
       </li>
@@ -164,9 +161,9 @@
           <h2 class="co d">Ember Media</h2>
           <p class="title">Creative Manager <span>(2007 – 2010)</span> · Senior Designer <span>(2005 – 2007)</span></p>
           <ul>
-            <li>Ran the design studio, promoted from Senior Designer to Creative Manager in 2007.</li>
-            <li>Led designers and developers on interactive TV, mobile and web projects.</li>
-            <li>Clients included Scholastic, MTV, Discovery, Animal Planet, Mobile ESPN and Cablevision.</li>
+            <li><b>Ran the design studio,</b> and was promoted from Senior Designer to Creative Manager in 2007.</li>
+            <li><b>Led designers and developers</b> on interactive TV, mobile and web projects.</li>
+            <li><b>Clients</b> included Scholastic, MTV, Discovery, Animal Planet, Mobile ESPN and Cablevision.</li>
           </ul>
         </div>
       </li>
