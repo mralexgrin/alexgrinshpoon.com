@@ -47,6 +47,11 @@
   .entry li::marker { color: var(--ink-3); }
   .entry li b { color: var(--ink); }
 
+  /* Brand logos under each stop, always grayscale */
+  .entry ul.logos { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 18px 0 0; padding: 0; list-style: none; max-width: none; }
+  .entry .logos li { margin: 0; display: flex; }
+  .logos img { display: block; height: calc(var(--h, 24px) * .72); width: auto; max-width: 130px; object-fit: contain; filter: grayscale(1) contrast(1.2); opacity: .72; }
+  .logos img.dim { filter: grayscale(1) brightness(.55) contrast(1.6); }
   @media (max-width: 760px) {
     .timeline { --date-w: 0px; }
     .timeline::before { left: 15px; }
@@ -57,17 +62,28 @@
     .entry__body { grid-column: 2; }
   }
   @media print {
-    @page { margin: 14mm 14mm; }
+    @page { margin: 10mm 13mm; }
     .bar { display: none; }
     header { padding: 0 0 18px; }
     h1 { font-size: 40px; }
     .timeline { margin-top: 18px; padding-bottom: 0; }
     .timeline::before { bottom: 0; }
-    .entry { break-inside: avoid; padding-bottom: 14px; }
+    .entry { break-inside: avoid; padding-bottom: 10px; }
     .entry ul { margin-top: 8px; } .entry li { margin-bottom: 3px; } .title { margin-top: 6px; } .co small { margin-top: 4px; }
-    body { font-size: 12.5px; }
+    body { font-size: 12.5px; line-height: 1.45; }
+    .entry ul { max-width: none; }
     .co { font-size: 22px; }
     .entry__date { font-size: 24px; }
+    /* Print keeps years beside the entries, like desktop */
+    .timeline { --date-w: 84px; }
+    .timeline::before { left: calc(var(--date-w) + 15px); }
+    .entry { grid-template-columns: var(--date-w) 32px minmax(0, 1fr); }
+    .entry__date { grid-column: 1; grid-row: 1; text-align: right; padding: 2px 0 0; font-size: 20px; }
+    .entry__date small { display: block; margin: 4px 0 0; font-size: 12px; }
+    .entry__dot { grid-column: 2; grid-row: 1; }
+    .entry__body { grid-column: 3; padding-left: 10px; }
+    .entry__dot::before { top: 6px; }
+    .entry ul.logos { margin-top: 6px; gap: 6px 16px; } .logos img { height: calc(var(--h, 24px) * .42); max-width: 64px; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 </style>
@@ -82,17 +98,18 @@
   </div>
 
   <main class="wrap">
-    <ol class="timeline" aria-label="Experience, newest first">
+    <ol class="timeline" aria-label="Experience and education, newest first">
       <li class="entry" id="paradium">
         <div class="entry__date d">2021<small>to present</small></div><div class="entry__dot" aria-hidden="true"></div>
         <div class="entry__body">
           <h2 class="co d">Paradium AI<small>formerly The Arena Group</small></h2>
           <p class="title">VP, Product Design</p>
           <ul>
-            <li><b>Core products.</b> Lead design for Sports Illustrated, Parade and TheStreet, on the web and in their apps. Designed the path from free reading to a paid subscription inside the story, and event hubs like March Madness that ad sales could sell across the network.</li>
-            <li><b>New platform.</b> Led the agencies that redesigned every site and moved them all onto one new content system. Added comments, games and other features that bring readers back.</li>
-            <li><b>Creator tools.</b> Now leading design as the company turns toward creators, from content tools like Cutter to social video.</li>
+            <li><b>Subscriptions and apps.</b> Led design for Sports Illustrated, Parade and TheStreet on the web and in their apps, guided by our research and testing program. Designed the subscription path inside the story and event hubs like March Madness. New templates and content strategy grew organic and affiliate traffic 42% year over year and engagement 125%, and faster concepts for ad sales helped land about 8 new sponsorship deals a month.</li>
+            <li><b>A modern platform in 18 months.</b> Managed several agencies to move every site onto a new CMS and front end within 18 months. Built the design system behind 300+ publications, cutting launch time from months to under two weeks and raising sprint capacity 68%, and added comments, games and other features to grow our community.</li>
+            <li><b>Creator tools, designed with AI.</b> Now helping the company become a creator-led B2B business, designing Cutter Studio, Tablation and other video creator products. I work with AI agents that draft PRDs, explore directions in parallel, check accessibility and copy, and build working prototypes, while I make the calls.</li>
           </ul>
+          <ul class="logos" aria-label="Brands"><li><img src="/img/logos/sports-illustrated.svg" alt="Sports Illustrated" style="--h:30px" loading="lazy"></li><li><img src="/img/logos/parade.svg" alt="Parade" style="--h:24px" loading="lazy"></li><li><img src="/img/logos/thestreet.svg" alt="TheStreet" style="--h:22px" loading="lazy"></li></ul>
         </div>
       </li>
       <li class="entry" id="pearson">
@@ -101,10 +118,11 @@
           <h2 class="co d">Pearson</h2>
           <p class="title">VP, Product Design</p>
           <ul>
-            <li><b>Led 10+ designers</b> across the eCommerce and Higher Ed teams.</li>
-            <li><b>Pearson.com redesign.</b> Led design and strategy for a new front door for students: a rebuilt store from browsing to checkout, a video learning app, and a design language later products were built on.</li>
-            <li><b>Pearson+, from brief to launch.</b> Wrote the brief, drew the flows, and took four directions to the executive team. Then led it through the move to an eText subscription sold straight to students. The app and website both shipped.</li>
+            <li><b>Built a global design group</b> of 10+ across research, product design and content strategy, leading the eCommerce and Higher Ed teams.</li>
+            <li><b>Pearson.com.</b> Led the team's design of 7 online stores across the US, UK and Canada, from a rebuilt checkout to the design language later products were built on, releasing monthly against KPIs and customer feedback.</li>
+            <li><b>Pearson+, from brief to launch.</b> Wrote the brief and drew the flows, then took four directions to the executive team. The team carried the winner through the move to an eText subscription sold straight to students, and both the app and website shipped.</li>
           </ul>
+          <ul class="logos" aria-label="Brands"><li><img src="/img/logos/pearson.svg" alt="Pearson" style="--h:26px" loading="lazy"></li><li><img src="/img/logos/pearson-plus.svg" alt="Pearson+" style="--h:31px" loading="lazy"></li></ul>
         </div>
       </li>
       <li class="entry" id="newell">
@@ -113,10 +131,11 @@
           <h2 class="co d">Newell Brands</h2>
           <p class="title">Director, Product Design</p>
           <ul>
-            <li><b>Built the UX team</b> from scratch to 10 people, reporting to the COO, for Yankee Candle, Graco, Marmot, Parker and other brands.</li>
+            <li><b>Built the UX team</b> from scratch to 10 people, plus a testing and optimization group, reporting to the COO, for Yankee Candle, Graco, Marmot, Parker and other brands.</li>
             <li><b>New Stack.</b> Introduced one design system and front end for every brand, and moved more than 120 brands onto it.</li>
-            <li><b>$350M in online sales.</b> Set up testing and customer research as direct sales grew to $350M, and cut agency costs by 35% by bringing design in-house.</li>
+            <li><b>$350M in online sales.</b> A consumer insights program and A/B testing in Optimizely and Google Analytics shaped the brand sites as direct sales grew to $350M. Brought design in-house and cut agency costs by 35%.</li>
           </ul>
+          <ul class="logos" aria-label="Brands"><li><img src="/img/logos/yankee-candle.svg" alt="Yankee Candle" style="--h:15px" loading="lazy"></li><li><img src="/img/logos/graco.svg" alt="Graco" style="--h:40px" loading="lazy"></li><li><img src="/img/logos/marmot.svg" alt="Marmot" style="--h:24px" loading="lazy"></li><li><img src="/img/logos/parker.svg" alt="Parker" class="dim" style="--h:44px" loading="lazy"></li><li><img src="/img/logos/coleman.svg" alt="Coleman" style="--h:26px" loading="lazy"></li><li><img src="/img/logos/calphalon.svg" alt="Calphalon" style="--h:54px" loading="lazy"></li></ul>
         </div>
       </li>
       <li class="entry" id="bn">
@@ -127,7 +146,7 @@
           <ul>
             <li><b>Led a team of 8</b> designers across BN.com on desktop, mobile, apps and in-store kiosks.</li>
             <li><b>The 2017 BN.com redesign.</b> Led the new homepage, the pages for finding books, and the design system behind them.</li>
-            <li><b>Testing that shipped.</b> Ran the A/B testing program, from the first idea to getting the winners live.</li>
+            <li><b>Decisions from data.</b> Ran the A/B testing program: wrote the hypotheses and KPIs, then shipped the winners.</li>
           </ul>
         </div>
       </li>
@@ -139,7 +158,7 @@
           <ul>
             <li><b>Led product and UX</b> on two social games, including DietBet, and took both out of beta.</li>
             <li><b>$7.5M in year one.</b> Designed DietBet's game and social rewards, which brought in more than $7.5M in first-year revenue.</li>
-            <li><b>iOS and Android.</b> Designed and prototyped the apps, and built the demos for the board and investors.</li>
+            <li><b>Prototype fast.</b> Built quick versions of the iOS and Android apps to test ideas, and the demos for the board and investors.</li>
           </ul>
         </div>
       </li>
@@ -151,20 +170,52 @@
           <ul>
             <li><b>NOOK HD.</b> Lead designer for the tablet's stores for apps, books and magazines, plus search, cart and checkout.</li>
             <li><b>Launched</b> the second generation of NOOK tablets.</li>
-            <li><b>Tested with customers,</b> built prototypes, and wrote the flows engineers built from.</li>
+            <li><b>Research first.</b> Tested designs with customers, built prototypes, and wrote the flows engineers built from.</li>
           </ul>
         </div>
       </li>
-      <li class="entry" id="ember">
-        <div class="entry__date d">2005<small>to 2010</small></div><div class="entry__dot" aria-hidden="true"></div>
+      <li class="entry" id="ember-cm">
+        <div class="entry__date d">2007<small>to 2010</small></div><div class="entry__dot" aria-hidden="true"></div>
         <div class="entry__body">
           <h2 class="co d">Ember Media</h2>
-          <p class="title">Creative Manager <span>(2007 – 2010)</span> · Senior Designer <span>(2005 – 2007)</span></p>
+          <p class="title">Creative Manager</p>
           <ul>
-            <li><b>Ran the design studio,</b> and was promoted from Senior Designer to Creative Manager in 2007.</li>
-            <li><b>Led designers and developers</b> on interactive TV, mobile and web projects.</li>
-            <li><b>Clients</b> included Scholastic, MTV, Discovery, Animal Planet, Mobile ESPN and Cablevision.</li>
+            <li><b>Ran the design studio,</b> leading designers and developers on interactive TV, CD-ROM and web projects.</li>
+            <li><b>Won new business</b> with concepts, demos and design proposals.</li>
+            <li><b>Clients</b> included Scholastic, MTV, Dish Network, Prudential and Essence.</li>
           </ul>
+          <ul class="logos" aria-label="Brands"><li><img src="/img/logos/scholastic.svg" alt="Scholastic" style="--h:15px" loading="lazy"></li><li><img src="/img/logos/mtv.svg" alt="MTV" style="--h:28px" loading="lazy"></li><li><img src="/img/logos/dish-network.svg" alt="Dish Network" style="--h:24px" loading="lazy"></li><li><img src="/img/logos/prudential.svg" alt="Prudential" style="--h:24px" loading="lazy"></li><li><img src="/img/logos/essence.png" alt="Essence" style="--h:17px" loading="lazy"></li></ul>
+        </div>
+      </li>
+      <li class="entry" id="ember-sd">
+        <div class="entry__date d">2005<small>to 2007</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Ember Media</h2>
+          <p class="title">Senior Designer</p>
+          <ul>
+            <li><b>Interactive TV.</b> Designed and tested apps for Cablevision's set-top box.</li>
+            <li><b>Mobile video.</b> Produced interactive mobile video for Mobile ESPN.</li>
+            <li><b>Clients</b> included Discovery Channel, Animal Planet, Mobile ESPN and Cablevision.</li>
+          </ul>
+          <ul class="logos" aria-label="Brands"><li><img src="/img/logos/discovery-channel.svg" alt="Discovery Channel" style="--h:28px" loading="lazy"></li><li><img src="/img/logos/animal-planet.svg" alt="Animal Planet" style="--h:40px" loading="lazy"></li><li><img src="/img/logos/espn.svg" alt="ESPN" style="--h:20px" loading="lazy"></li><li><img src="/img/logos/cablevision.svg" alt="Cablevision" style="--h:18px" loading="lazy"></li></ul>
+        </div>
+      </li>
+      <li class="entry" id="aestheticom">
+        <div class="entry__date d">2002<small>internship</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">Aestheticom</h2>
+          <p class="title">Post-Production Assistant <span>(Intern)</span></p>
+          <ul>
+            <li><b>Music videos.</b> Worked on multiple music videos, doing 3D pre-visualization and storyboarding.</li>
+            <li><b>Post-production.</b> Prepared raw video and audio for editing in Avid and Final Cut.</li>
+          </ul>
+        </div>
+      </li>
+      <li class="entry" id="nyit">
+        <div class="entry__date d">2000<small>to 2005</small></div><div class="entry__dot" aria-hidden="true"></div>
+        <div class="entry__body">
+          <h2 class="co d">New York Institute of Technology</h2>
+          <p class="title">BFA, Computer Graphics</p>
         </div>
       </li>
     </ol>
