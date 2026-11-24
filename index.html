@@ -51,13 +51,14 @@
          -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
          animation: pan 34s ease-in-out infinite alternate; }
     @keyframes pan { to { background-position: 0 0, 0 0, 0 0, 100% 60%; } }
-    h1 span { position: relative; display: block; white-space: nowrap; }
+    h1 span { display: block; white-space: nowrap; }
     h1 { overflow: clip; overflow-clip-margin: .04em; }
     h1 .l1 { font-size: min(2.47em, 58vh); }
     /* Red and blue ghosts, nudged apart, for the colour fringe */
-    h1 span::before, h1 span::after { content: attr(data-text); position: absolute; top: 0; pointer-events: none; mix-blend-mode: multiply; }
-    h1 span::before { left: -.014em; -webkit-text-fill-color: rgb(255 20 70 / .3); }
-    h1 span::after { left: .014em; -webkit-text-fill-color: rgb(20 120 255 / .3); }
+    /* Kept in the normal flow (a zero-height line laid over the text) rather than positioned:
+       Safari leaves positioned text out of the photo fill, which turned the name pale purple on iPhones */
+    h1 span::before { content: attr(data-text); display: block; height: 0; margin-left: -.014em; pointer-events: none; mix-blend-mode: multiply;
+      -webkit-text-fill-color: rgb(255 20 70 / .3); text-shadow: .028em 0 rgb(20 120 255 / .3); }
     /* Terminal block cursor */
     /* The negative right margin keeps the cursor from wrapping once a line fills the width */
     .caret { display: inline-block; width: .48em; height: .7em; margin: 0 -.56em 0 .08em; vertical-align: baseline; background: var(--ink); box-shadow: -.02em 0 rgb(255 20 70 / .55), .02em 0 rgb(20 120 255 / .55); animation: blink 1.06s steps(1) infinite; }
@@ -72,9 +73,9 @@
     .art.gone { opacity: 0; }
     /* In the type spec, the letters are plain ink, like a spec sheet */
     h1 { transition: -webkit-text-fill-color 1.2s ease; }
-    h1 span::before, h1 span::after { transition: opacity 1.2s ease; }
+    h1 span::before { transition: opacity 1.2s ease; }
     h1.spec { -webkit-text-fill-color: var(--ink); }
-    h1.spec span::before, h1.spec span::after { opacity: 0; }
+    h1.spec span::before { opacity: 0; }
     /* Single letters, so the spacing can be adjusted one at a time */
     h1 b { position: relative; font: inherit; }
 
@@ -203,7 +204,8 @@
       function stems(mask) {
         const out = [];
         for (const line of [0, 1]) {
-          const gs = mask.glyphs.filter(g => g.line === line), g = gs.find(g => 'ILEHNPRT'.includes(g.ch)) || gs[0];
+          // Measured on the straightest letter available (I, H, N, L…), never on a bowl or a diagonal
+          const gs = mask.glyphs.filter(g => g.line === line), g = [...'IHNLETPR'].map(ch => gs.find(x => x.ch === ch)).find(Boolean) || gs[0];
           const capH = g.y1 - g.y0, y = g.y0 + capH * .5;
           let x = g.x0 + 1; while (x < g.x1 && !inside(mask, x, y)) x++;
           const s = x; while (x < g.x1 && inside(mask, x, y)) x++;
@@ -228,7 +230,7 @@
       };
       // The strokes a sign painter would make for each letter, fitted to the letter's ink box
       function strokesFor(g, w) {
-        const { x0, x1, y0, y1 } = g, b = w * .86, bw = x1 - x0, bh = y1 - y0, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        const { x0, x1, y0, y1 } = g, b = w * .74, bw = x1 - x0, bh = y1 - y0, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
         const Lx = x0 + w / 2, Rx = x1 - w / 2, Ty = y0 + b / 2, By = y1 - b / 2, o = w * .12;
         const bowl = bottom => { const ry = (bottom - Ty) / 2, rx = Math.min(ry * 1.15, bw * .42); return [[x0, Ty], [Rx - rx, Ty], ...arc(Rx - rx, Ty + ry, rx, ry, -Math.PI / 2, Math.PI / 2, 24).slice(1), [x0 + w * .4, Ty + ry * 2]]; };
         switch (g.ch) {
@@ -305,7 +307,9 @@
           const w = stem[gl.line];
           for (const pts of strokesFor(gl, w)) {
             const color = order[nth++ % order.length];
-            const b = pathBrush(pts, w * (1.04 + R() * .1), color, t);
+            // Bars are thinner than stems in this typeface; curves a touch thinner too, so counters stay open
+            const capH = gl.y1 - gl.y0, flat = pts.length === 2 && Math.abs(pts[1][1] - pts[0][1]) < capH * .1, slant = pts.length === 2 && !flat && Math.abs(pts[1][0] - pts[0][0]) > capH * .15;
+            const b = pathBrush(pts, w * (flat ? .78 : slant ? .86 : pts.length > 2 ? .88 : .96) * (.97 + R() * .08), color, t);
             strokes.push(b);
             t += b.dur + 25; // the next stroke waits, so each one sits cleanly on top of the last
           }
