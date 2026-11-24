@@ -64,6 +64,20 @@
     .caret.busy { animation: none; }
     @keyframes blink { 50% { opacity: 0; } }
 
+    /* The paint stage is drawn on a canvas over the page, fitted to the real letters.
+       The typed letters stay in place underneath, so the layout never moves. */
+    body { position: relative; }
+    .top { position: relative; z-index: 1; }
+    .art { position: absolute; left: 0; top: 0; pointer-events: none; transition: opacity .7s ease; }
+    .art.gone { opacity: 0; }
+    /* In the type spec, the letters are plain ink, like a spec sheet */
+    h1 { transition: -webkit-text-fill-color 1.2s ease; }
+    h1 span::before, h1 span::after { transition: opacity 1.2s ease; }
+    h1.spec { -webkit-text-fill-color: var(--ink); }
+    h1.spec span::before, h1.spec span::after { opacity: 0; }
+    /* Single letters, so the spacing can be adjusted one at a time */
+    h1 b { position: relative; font: inherit; }
+
     @media (max-width: 760px) { .top { flex-direction: column; } h1 { font-size: 11.6vw; } }
     @media (prefers-reduced-motion: reduce) { h1 { animation: none; } .links a { transition: none; } }
   </style>
@@ -78,39 +92,397 @@
   </div>
   <h1 id="name" aria-label="Alex Grinshpoon"><span class="l1" data-text="Alex" aria-hidden="true">Alex</span><span class="l2" data-text="Grinshpoon" aria-hidden="true">Grinshpoon</span></h1>
   <script>
-    // Types the name like a terminal: a blinking cursor, then "Alex", Enter, then "Grinshpoon".
-    // The name is in the HTML, so without script or with reduced motion it simply shows in full.
+    // The name plays out once, then settles:
+    //   1. typed on a screen (blinking cursor, "Alex", Enter, "Grinshpoon")
+    //   2. every stroke of every letter painted over the typed name in one brush stroke, one colour each
+    //   3. spec guides come in over the paint, the paint fades, the spacing is fixed letter by letter,
+    //      then the guides leave and the name stays as black lettering
+    // The paint is traced from the real letters onto a canvas. The name is in the HTML,
+    // so without script or with reduced motion it simply shows in full.
     (() => {
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const h1 = document.getElementById('name');
       const [l1, l2] = h1.querySelectorAll('span');
       const words = [l1.textContent, l2.textContent];
+      const R = Math.random, pick = a => a[Math.floor(R() * a.length)];
+      const wait = ms => new Promise(r => setTimeout(r, ms));
+      const frame = () => new Promise(r => requestAnimationFrame(r));
       const caret = document.createElement('i');
       caret.className = 'caret';
       caret.setAttribute('aria-hidden', 'true');
-      const set = (el, text) => { el.textContent = text; el.dataset.text = text; el.append(caret); };
-      set(l2, ''); l2.remove(); caret.remove();
-      set(l1, '');
-      const wait = ms => new Promise(r => setTimeout(r, ms));
+      const set = (el, text, withCaret = true) => { el.textContent = text; el.dataset.text = text; if (withCaret) el.append(caret); };
+      // Hold the name's height while lines change, so nothing jumps
+      const lock = on => { h1.style.height = on ? h1.getBoundingClientRect().height + 'px' : ''; };
+      // A resize mid-drawing makes the traced letters stale: start over from the typing
+      let generation = 0;
+      addEventListener('resize', () => generation++);
+      const Stale = new Error('stale');
+
+      // ---- 1. Typing ----
+      // Start from a blank line and a cursor
+      set(l2, '', false); l2.remove(); set(l1, '');
       const type = async (el, word) => {
         caret.classList.add('busy');
-        for (let i = 1; i <= word.length; i++) { set(el, word.slice(0, i)); await wait(85 + Math.random() * 120); }
+        for (let i = 1; i <= word.length; i++) { set(el, word.slice(0, i)); await wait(85 + R() * 120); }
         caret.classList.remove('busy');
       };
-      (async () => {
-        await Promise.race([document.fonts.ready, wait(1500)]);
+      async function typeIn() {
         await wait(1300);
         await type(l1, words[0]);
         await wait(650);
         // Enter: a new line opens at the bottom and pushes "Alex" up
-        set(l1, words[0]); caret.remove();
+        set(l1, words[0], false);
         h1.append(l2); set(l2, '');
         const lineH = l2.getBoundingClientRect().height;
         l2.animate([{ height: '0px' }, { height: lineH + 'px' }], { duration: 520, easing: 'cubic-bezier(.2, .7, .2, 1)' });
         await wait(870);
         await type(l2, words[1]);
-        await wait(1600);
-        caret.remove();
+      }
+
+      // ---- Canvas over the page, and the letter shapes traced onto it ----
+      const art = document.createElement('canvas');
+      art.className = 'art gone';
+      art.setAttribute('aria-hidden', 'true');
+      document.body.append(art);
+      let W, H, K, ctx, u, region;
+      const layer = () => {
+        const c = document.createElement('canvas'); c.width = art.width; c.height = art.height;
+        const x = c.getContext('2d', { willReadFrequently: true }); x.setTransform(K, 0, 0, K, 0, 0); x.lineCap = x.lineJoin = 'round';
+        return [c, x];
+      };
+      function setup() {
+        W = document.documentElement.scrollWidth; H = Math.max(document.documentElement.scrollHeight, innerHeight);
+        K = Math.min(1.5, devicePixelRatio || 1);
+        art.width = Math.round(W * K); art.height = Math.round(H * K);
+        art.style.width = W + 'px'; art.style.height = H + 'px';
+        ctx = art.getContext('2d'); ctx.setTransform(K, 0, 0, K, 0, 0); ctx.lineCap = ctx.lineJoin = 'round';
+        u = parseFloat(getComputedStyle(l2).fontSize) / 180; // 1 on a laptop, smaller on phones
+        const b = h1.getBoundingClientRect();
+        region = { x: b.left + scrollX, y: b.top + scrollY, w: b.width, h: b.height };
+      }
+      // Each letter is drawn at the exact spot the browser placed it, so the shapes line up.
+      // Also returns each letter's ink box, which the brush paths are fitted to.
+      function letterMask() {
+        const [m, c] = layer(), glyphs = [];
+        c.fillStyle = '#000';
+        for (const span of [l1, l2]) {
+          const cs = getComputedStyle(span), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight);
+          c.font = `900 ${fs}px "Mona Sans", sans-serif`;
+          if ('fontStretch' in c) c.fontStretch = 'expanded';
+          const mt = c.measureText('H'), asc = mt.fontBoundingBoxAscent, desc = mt.fontBoundingBoxDescent;
+          const top = span.getBoundingClientRect().top + scrollY, base = top + (lh - asc - desc) / 2 + asc;
+          const text = span.firstChild, ls = parseFloat(cs.letterSpacing) || 0, boxes = [];
+          let dom = 0, drawn = 0;
+          for (let i = 0; i < text.length; i++) {
+            const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1);
+            const r = range.getBoundingClientRect(), ch = text.data[i].toUpperCase();
+            boxes.push([ch, r.left + scrollX]); dom += r.width - ls; drawn += c.measureText(ch).width;
+          }
+          // If this browser ignored the wide setting on canvas, stretch each letter to match the page
+          const sx = Math.abs(dom / drawn - 1) > .05 ? dom / drawn : 1;
+          for (const [ch, x] of boxes) {
+            c.save(); c.translate(x, base); c.scale(sx, 1); c.fillText(ch, 0, 0); c.restore();
+            const b = c.measureText(ch);
+            glyphs.push({ ch, x0: x - b.actualBoundingBoxLeft * sx, x1: x + b.actualBoundingBoxRight * sx, y0: base - b.actualBoundingBoxAscent, y1: base + b.actualBoundingBoxDescent, line: span === l1 ? 0 : 1 });
+          }
+        }
+        return { canvas: m, data: c.getImageData(0, 0, m.width, m.height).data, glyphs };
+      }
+      const inside = (mask, x, y) => {
+        const px = Math.round(x * K), py = Math.round(y * K);
+        return px >= 0 && py >= 0 && px < art.width && py < art.height && mask.data[(py * art.width + px) * 4 + 3] > 127;
+      };
+      // Appear at once; fading is only for leaving
+      const show = () => { art.style.transition = 'none'; art.classList.remove('gone'); art.offsetWidth; art.style.transition = ''; };
+
+      // ---- 2. Brush lettering over the typed name ----
+      const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+
+      // ---- Brush lettering: every stroke of every letter is one brush stroke in one colour ----
+      // Stem thickness, measured from the real letters: the run of ink across a straight stem
+      function stems(mask) {
+        const out = [];
+        for (const line of [0, 1]) {
+          const gs = mask.glyphs.filter(g => g.line === line), g = gs.find(g => 'ILEHNPRT'.includes(g.ch)) || gs[0];
+          const capH = g.y1 - g.y0, y = g.y0 + capH * .5;
+          let x = g.x0 + 1; while (x < g.x1 && !inside(mask, x, y)) x++;
+          const s = x; while (x < g.x1 && inside(mask, x, y)) x++;
+          const w = x - s;
+          out[line] = w > capH * .12 && w < capH * .6 ? w : capH * .3;
+        }
+        return out;
+      }
+      const arc = (cx, cy, rx, ry, a0, a1, n = 44) => Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]; });
+      // A smooth curve through the given points (Catmull-Rom)
+      const curve = pts => {
+        const out = [];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+          for (let t = 0; t < 1; t += .1) {
+            const t2 = t * t, t3 = t2 * t, f = (a, b, c, d) => .5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+            out.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]);
+          }
+        }
+        out.push(pts[pts.length - 1]);
+        return out;
+      };
+      // The strokes a sign painter would make for each letter, fitted to the letter's ink box
+      function strokesFor(g, w) {
+        const { x0, x1, y0, y1 } = g, b = w * .86, bw = x1 - x0, bh = y1 - y0, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        const Lx = x0 + w / 2, Rx = x1 - w / 2, Ty = y0 + b / 2, By = y1 - b / 2, o = w * .12;
+        const bowl = bottom => { const ry = (bottom - Ty) / 2, rx = Math.min(ry * 1.15, bw * .42); return [[x0, Ty], [Rx - rx, Ty], ...arc(Rx - rx, Ty + ry, rx, ry, -Math.PI / 2, Math.PI / 2, 24).slice(1), [x0 + w * .4, Ty + ry * 2]]; };
+        switch (g.ch) {
+          case 'A': return [[[x0 + w * .55, y1 + o], [cx, y0 + w * .2]], [[cx, y0 + w * .2], [x1 - w * .55, y1 + o]], [[x0 + bw * .26, y0 + bh * .7], [x1 - bw * .26, y0 + bh * .7]]];
+          case 'L': return [[[Lx, y0 - o], [Lx, y1]], [[x0, By], [x1 + o, By]]];
+          case 'E': return [[[Lx, y0], [Lx, y1]], [[x0, Ty], [x1 + o * .5, Ty]], [[x0, cy], [x1 - bw * .06, cy]], [[x0, By], [x1 + o * .5, By]]];
+          case 'X': return [[[x0 + w * .45, y0 - o * .5], [x1 - w * .45, y1 + o * .5]], [[x1 - w * .45, y0 - o * .5], [x0 + w * .45, y1 + o * .5]]];
+          case 'G': return [arc(cx, cy, bw / 2 - w / 2, bh / 2 - b / 2, -.2 * Math.PI, -1.97 * Math.PI), [[cx + bw * .02, y0 + bh * .56], [Rx, y0 + bh * .56], [Rx, y1 - b * .4]]];
+          case 'R': return [[[Lx, y0], [Lx, y1 + o]], bowl(y0 + bh * .56), [[x0 + bw * .42, y0 + bh * .56], [Rx, y1 + o]]];
+          case 'P': return [[[Lx, y0], [Lx, y1 + o]], bowl(y0 + bh * .62)];
+          case 'I': return [[[cx, y0 - o], [cx, y1 + o]]];
+          case 'N': return [[[Lx, y1 + o], [Lx, y0]], [[Lx, y0], [Rx, y1]], [[Rx, y1], [Rx, y0 - o]]];
+          case 'H': return [[[Lx, y0 - o], [Lx, y1 + o]], [[Rx, y0 - o], [Rx, y1 + o]], [[x0 + w * .3, cy], [x1 - w * .3, cy]]];
+          case 'O': return [arc(cx, cy, bw / 2 - w / 2, bh / 2 - b / 2, -Math.PI / 2, -Math.PI / 2 - 2.06 * Math.PI, 60)];
+          case 'S': return [curve([[x1 - bw * .1, y0 + bh * .2], [cx + bw * .14, Ty], [cx - bw * .14, Ty], [Lx, y0 + bh * .28], [cx - bw * .12, cy - bh * .03], [cx + bw * .12, cy + bh * .03], [Rx, y1 - bh * .28], [cx + bw * .14, By], [cx - bw * .14, By], [x0 + bw * .1, y1 - bh * .2]])];
+          default: return [[[cx, y0], [cx, y1]]];
+        }
+      }
+      // One brush stroke along a path: one colour, a band of bristles that streak a little
+      // lighter and darker, a slight wobble, and a dry, broken end
+      function pathBrush(pts, bw, color, t0) {
+        const pathPts = [], step = 3 * u, phase = R() * 9, wob = bw * .022;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const [ax, ay] = pts[i], [bx, by] = pts[i + 1], len = Math.hypot(bx - ax, by - ay);
+          for (let d = 0; d < len; d += step) pathPts.push([ax + (bx - ax) * d / len, ay + (by - ay) * d / len]);
+        }
+        pathPts.push(pts[pts.length - 1]);
+        const n = pathPts.length, P = pathPts.map((p, i) => {
+          const a = pathPts[Math.max(0, i - 2)], c = pathPts[Math.min(n - 1, i + 2)], dx = c[0] - a[0], dy = c[1] - a[1], l = Math.hypot(dx, dy) || 1;
+          const nx = -dy / l, ny = dx / l, s = Math.sin(i * .035 + phase) * wob;
+          return [p[0] + nx * s, p[1] + ny * s, nx, ny];
+        });
+        const base = rgb(color), count = Math.max(8, Math.min(34, bw / 2 | 0));
+        const bristles = Array.from({ length: count }, (_, i) => {
+          const v = 1 + (R() - .5) * .14;
+          return { off: (i / (count - 1) - .5) * bw * .96 + (R() - .5) * bw / count, w: bw / count * (2.2 + R() * 1.4), a: .82 + R() * .18, s1: R() < .3 ? .8 + R() * .14 : 1,
+                   color: `rgb(${base.map(c => Math.max(0, Math.min(255, c * v | 0))).join(',')})`, at: 0 };
+        });
+        return { P, bristles, t0, dur: 80 + n * step / (2600 + R() * 700) * 1000 };
+      }
+      function drawPath(c, b, k) {
+        c.lineCap = 'butt';
+        const n = b.P.length;
+        for (const br of b.bristles) {
+          // Dry bristles feather out past their point instead of stopping dead
+          const to = Math.min(k, br.s1 + .14), i0 = Math.floor(br.at * (n - 1)), i1 = Math.floor(to * (n - 1));
+          if (i1 <= i0) continue;
+          const mid = (br.at + to) / 2;
+          c.strokeStyle = br.color; c.lineWidth = br.w; c.globalAlpha = br.a * (mid > br.s1 ? Math.max(0, 1 - (mid - br.s1) / .14) : 1);
+          c.beginPath();
+          for (let i = Math.max(0, i0 - 1); i <= i1; i++) {
+            const [x, y, nx, ny] = b.P[i], s = i / (n - 1), spread = .82 + .18 * Math.min(1, s * 8); // bristles splay as the brush lands
+            const px = x + nx * br.off * spread, py = y + ny * br.off * spread;
+            i === Math.max(0, i0 - 1) ? c.moveTo(px, py) : c.lineTo(px, py);
+          }
+          c.stroke();
+          br.at = to;
+        }
+        c.globalAlpha = 1; c.lineCap = 'round';
+      }
+      async function paint() {
+        const g = generation;
+        setup();
+        const mask = letterMask(), stem = stems(mask);
+        // Finished strokes live on one layer; the stroke being painted on another, so it can be glazed over the rest
+        const [Bp, bc] = layer(), [Cur, cc] = layer(), MIX = .55;
+        // Multiplied first (full colour on bare page, a mixed colour where it crosses paint), then partly laid on top
+        const glaze = (c, src) => { c.globalCompositeOperation = 'multiply'; c.drawImage(src, 0, 0); c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1 - MIX; c.drawImage(src, 0, 0); c.globalAlpha = 1; };
+        // Letter by letter, left to right, each stroke one colour; neighbouring strokes never share a colour
+        const colors = ['#e5482c', '#2c5fbf', '#f2b134', '#1f8f7a', '#151413', '#d9437a', '#ff6a1f', '#5a3f9e'];
+        const strokes = [], order = colors.sort(() => R() - .5);
+        let t = 200, nth = 0;
+        for (const gl of mask.glyphs) {
+          const w = stem[gl.line];
+          for (const pts of strokesFor(gl, w)) {
+            const color = order[nth++ % order.length];
+            const b = pathBrush(pts, w * (1.04 + R() * .1), color, t);
+            strokes.push(b);
+            t += b.dur + 25; // the next stroke waits, so each one sits cleanly on top of the last
+          }
+          t += 40;
+        }
+        // A drip or two, only from the bottom edge of letters on the bottom line, once the paint is on.
+        // Each drip takes the colour actually painted where it starts.
+        const painted = Math.max(...strokes.map(b => b.t0 + b.dur)), drips = [];
+        const bottom = mask.glyphs.filter(x => x.line === 1).sort(() => R() - .5);
+        for (const gl of bottom.slice(0, R() < .5 ? 1 : 2)) {
+          const y = gl.y1 - 2 * u, xs = [];
+          for (let x = gl.x0; x <= gl.x1; x += 3 * u) if (inside(mask, x, y)) xs.push(x);
+          if (xs.length) drips.push({ x: pick(xs), y: gl.y1 - 3 * u, len: (35 + R() * 55) * u, w: (4 + R() * 2.5) * u, color: null, t0: painted + 200 + drips.length * 450 });
+        }
+        const end = Math.max(...strokes.map(b => b.t0 + b.dur), ...drips.map(d => d.t0 + 1500)) + 100;
+        show();
+        const start = performance.now();
+        for (let now = 0; now < end; now = (await frame()) - start) {
+          if (g !== generation) throw Stale;
+          for (const b of strokes) {
+            if (b.done || now < b.t0) continue;
+            const k = Math.min(1, (now - b.t0) / b.dur);
+            drawPath(cc, b, k);
+            if (k === 1) {
+              // Where this stroke crosses earlier ones, the colours mix like a translucent glaze
+              b.done = true;
+              bc.setTransform(1, 0, 0, 1, 0, 0); glaze(bc, Cur); bc.setTransform(K, 0, 0, K, 0, 0);
+              cc.setTransform(1, 0, 0, 1, 0, 0); cc.clearRect(0, 0, Cur.width, Cur.height); cc.setTransform(K, 0, 0, K, 0, 0);
+            }
+          }
+          ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, art.width, art.height);
+          ctx.drawImage(Bp, 0, 0); glaze(ctx, Cur);
+          ctx.setTransform(K, 0, 0, K, 0, 0);
+          for (const d of drips) {
+            if (now < d.t0) continue;
+            if (!d.color) {
+              // Pick up the paint colour just above where the drip starts
+              const px = bc.getImageData(Math.round(d.x * K), Math.round((d.y - 6 * u) * K), 1, 1).data;
+              d.color = px[3] > 160 ? `rgb(${px[0]},${px[1]},${px[2]})` : '#151413';
+            }
+            drawDrip(ctx, d, Math.min(1, (now - d.t0) / 1500));
+          }
+        }
+        // Keep the finished painting, so the next stage can fade it out
+        const [final, fc] = layer(); fc.setTransform(1, 0, 0, 1, 0, 0); fc.drawImage(art, 0, 0);
+        return { mask, stem, final };
+      }
+      function drawDrip(c, d, k) {
+        if (k <= 0) return;
+        const e = 1 - (1 - k) ** 3, y2 = d.y + d.len * e;
+        c.fillStyle = d.color; c.fillRect(d.x - d.w / 2, d.y, d.w, y2 - d.y);
+        c.beginPath(); c.arc(d.x, y2, d.w * .6, 0, Math.PI * 2); c.fill();
+        c.fillStyle = 'rgba(255,255,255,.14)'; c.fillRect(d.x - d.w * .3, d.y, d.w * .14, y2 - d.y);
+      }
+
+      // ---- 3. Type spec: guides go down over the paint, the paint fades, a designer fixes the spacing ----
+      const SPEC = '#ff7a3d';
+      async function spec(painted) {
+        const g = generation, { mask } = painted, gl = mask.glyphs;
+        const rows = [[l1, words[0]], [l2, words[1]]].map(([el, word], line) => {
+          const gs = gl.filter(x => x.line === line);
+          return { el, word, gs, fs: parseFloat(getComputedStyle(el).fontSize), letters: [], off: gs.map(() => 0), cap: Math.min(...gs.map(x => x.y0)), base: Math.max(...gs.map(x => x.y1)) };
+        });
+        // Under the fading paint, the letters become plain ink, each its own element, set a little off like a rough sketch
+        const sketch = () => {
+          for (const r of rows) {
+            r.el.textContent = '';
+            r.letters = [...r.word].map(ch => { const b = document.createElement('b'); b.textContent = ch; r.el.append(b); return b; });
+            r.off = r.letters.map((_, i) => i === 0 || i === r.letters.length - 1 ? 0 : (R() < .5 ? -1 : 1) * r.fs * (.018 + R() * .03));
+          }
+          h1.classList.add('spec');
+        };
+        const place = () => rows.forEach(r => r.letters.forEach((b, i) => { b.style.left = r.off[i] ? r.off[i].toFixed(2) + 'px' : ''; }));
+        const left = region.x - 18 * u, right = region.x + region.w + 18 * u, lw = Math.max(2, 4 * u);
+        const fsz = Math.max(15, Math.min(34, 30 * u)), gap = Math.max(5, 9 * u);
+        const lines = [
+          { y: rows[0].cap, color: SPEC, d: 0 }, { y: rows[0].base, color: SPEC, d: 90 },
+          { y: (rows[0].cap + rows[0].base) / 2, color: 'rgba(17,18,20,.14)', d: 140 },
+          { y: rows[1].cap, color: SPEC, d: 180 }, { y: rows[1].base, color: SPEC, d: 270 }
+        ];
+        const labels = [
+          { text: 'Cap Height', x: right, y: rows[0].cap - gap, align: 'right', d: 700 },
+          { text: 'Kerning', x: (left + right) / 2, y: rows[0].cap - gap, align: 'center', d: 800 },
+          { text: 'Baseline', x: left, y: rows[1].base + gap + fsz * .8, align: 'left', d: 900 },
+          { text: 'Spacing', x: (left + right) / 2, y: rows[1].base + gap + fsz * .8, align: 'center', d: 1000 }
+        ];
+        // Timeline: guides in (right to left, over the paint), then the paint fades slowly to the letters,
+        // then the spacing is fixed one letter at a time, then the guides leave (left to right)
+        const fadeFrom = 1100, fadeTo = 2900, barsAt = 2300, fixAt = 3000;
+        const ease = k => 1 - (1 - k) ** 3, inOut = k => k < .5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2, clamp = k => Math.min(1, Math.max(0, k));
+        let fixes = null, exitAt = Infinity, end = Infinity, sketched = false;
+        const start = performance.now();
+        for (let t = 0; t < end; t = (await frame()) - start) {
+          if (g !== generation) throw Stale;
+          if (!sketched && t >= fadeFrom) {
+            sketched = true; sketch(); place();
+            fixes = [];
+            let at = fixAt;
+            rows.forEach((r, ri) => r.off.forEach((o, i) => { if (o) { fixes.push({ ri, i, from: o, t0: at }); at += 330; } }));
+            exitAt = at + 900; end = exitAt + 900;
+          }
+          if (fixes) { for (const f of fixes) rows[f.ri].off[f.i] = f.from * (1 - inOut(clamp((t - f.t0) / 280))); place(); }
+          const out = clamp((t - exitAt) / 800), stay = 1 - out;
+          ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, art.width, art.height);
+          ctx.globalAlpha = 1 - inOut(clamp((t - fadeFrom) / (fadeTo - fadeFrom))); ctx.drawImage(painted.final, 0, 0); ctx.globalAlpha = 1;
+          ctx.setTransform(K, 0, 0, K, 0, 0);
+          // Gap bars between every pair of letters, sized to the gap as it is right now
+          if (fixes) {
+            ctx.globalCompositeOperation = 'multiply';
+            rows.forEach((r, ri) => {
+              const grow = ease(clamp((t - barsAt - ri * 150) / 450)) * (1 - ease(out));
+              if (grow <= 0) return;
+              for (let i = 0; i < r.gs.length - 1; i++) {
+                const a = r.gs[i].x1 + r.off[i], b = r.gs[i + 1].x0 + r.off[i + 1], w = Math.max(3 * u, b - a), x = (a + b) / 2 - w / 2;
+                const active = fixes.find(f => f.ri === ri && (f.i === i + 1 || f.i === i) && t >= f.t0 - 60 && t <= f.t0 + 380);
+                ctx.fillStyle = active ? 'rgba(255,122,61,.75)' : 'rgba(255,176,120,.5)';
+                const hgt = (r.base - r.cap) * grow;
+                ctx.fillRect(x, r.base - hgt, w, hgt);
+              }
+            });
+            ctx.globalCompositeOperation = 'source-over';
+            // Kerning values, shown on the letter being fixed
+            ctx.font = `700 ${fsz * .62}px Manrope, system-ui, sans-serif`; ctx.textAlign = 'center';
+            for (const f of fixes) {
+              const k = clamp((t - f.t0 + 60) / 120) * clamp((f.t0 + 520 - t) / 160);
+              if (k <= 0) continue;
+              const r = rows[f.ri], gsl = r.gs[f.i], x = (gsl.x0 + gsl.x1) / 2 + r.off[f.i], y = (r.cap + r.base) / 2;
+              const units = Math.round(-f.from / r.fs * 1000), text = (units > 0 ? '+' : '−') + Math.abs(units);
+              const tw = ctx.measureText(text).width + fsz * .6, th = fsz * .95;
+              ctx.globalAlpha = k; ctx.fillStyle = SPEC;
+              ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - tw / 2, y - th / 2, tw, th, th / 2) : ctx.rect(x - tw / 2, y - th / 2, tw, th); ctx.fill();
+              ctx.fillStyle = '#fff'; ctx.fillText(text, x, y + fsz * .22);
+            }
+            ctx.globalAlpha = 1;
+          }
+          // Guide lines come in from the right, and leave moving off to the right
+          ctx.lineCap = 'round'; ctx.lineWidth = lw;
+          for (const l of lines) {
+            const into = ease(clamp((t - l.d) / 700)), away = ease(clamp((t - exitAt - l.d * .6) / 650));
+            const x0 = right - (right - left) * into, x1 = right, from = x0 + (x1 - x0) * away;
+            if (into <= 0 || away >= 1) continue;
+            ctx.strokeStyle = l.color; ctx.beginPath(); ctx.moveTo(from, l.y); ctx.lineTo(x1, l.y); ctx.stroke();
+          }
+          ctx.font = `600 ${fsz}px Manrope, system-ui, sans-serif`; ctx.fillStyle = SPEC;
+          for (const l of labels) {
+            const k = ease(clamp((t - l.d) / 400)) * stay;
+            ctx.globalAlpha = k; ctx.textAlign = l.align; ctx.fillText(l.text, l.x, l.y + (1 - k) * 8 * u);
+          }
+          ctx.globalAlpha = 1; ctx.textAlign = 'left';
+        }
+        ctx.clearRect(0, 0, W, H);
+        art.classList.add('gone');
+      }
+
+      // Whatever happens, end on the black lettering, fully set
+      const finish = () => {
+        art.classList.add('gone'); if (ctx) ctx.clearRect(0, 0, W, H);
+        caret.remove(); h1.classList.add('spec'); lock(false);
+        if (!l2.isConnected) h1.append(l2);
+        for (const [el, word] of [[l1, words[0]], [l2, words[1]]]) {
+          if (el.textContent !== word || el.querySelector('i')) set(el, word, false);
+          el.querySelectorAll('b').forEach(b => { b.style.left = ''; });
+        }
+      };
+      (async () => {
+        await Promise.race([document.fonts.ready, wait(1500)]);
+        try {
+          await typeIn();
+          await wait(3000);
+          caret.remove(); lock(true);
+          const painted = await paint();
+          await wait(2200);
+          await spec(painted);
+        } catch (e) {
+          if (e !== Stale) throw e;
+        }
+        finish();
       })();
     })();
   </script>

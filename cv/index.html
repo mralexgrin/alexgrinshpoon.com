@@ -37,6 +37,13 @@
   .entry__dot { position: relative; }
   .entry__dot::before { content: ""; position: absolute; top: 12px; left: 50%; translate: -50% 0; box-sizing: border-box; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); }
   .entry:first-child .entry__dot::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px rgb(255 90 31 / .18); }
+  /* One orange dot moves down the line as you scroll and settles on the dot beside each year.
+     Passed stops fill in. */
+  .tracker, .trail { position: absolute; top: 0; left: calc(var(--date-w) + 16px); margin: 0; pointer-events: none; list-style: none; }
+  .trail { top: 10px; width: 2px; height: var(--trail, 0px); translate: -50% 0; background: var(--accent); transition: height .45s cubic-bezier(.3, .7, .2, 1); }
+  .tracker { width: 16px; height: 16px; translate: -50% -50%; transform: translateY(var(--y, 20px)); border-radius: 50%; z-index: 1; background: var(--accent); box-shadow: 0 0 0 5px rgb(255 90 31 / .18); transition: transform .45s cubic-bezier(.3, .7, .2, 1); }
+  .has-tracker .entry:first-child .entry__dot::before { background: #fff; border-color: var(--ink); box-shadow: none; }
+  .entry.is-past .entry__dot::before { background: var(--ink); }
   .entry__body { padding-left: 14px; }
   .co { margin: 0; font-size: clamp(26px, 2.6vw, 38px); }
   .co small { display: block; margin-top: 8px; font: 700 14px/1.3 "Manrope", sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
@@ -83,6 +90,9 @@
     .entry__dot { grid-column: 2; grid-row: 1; }
     .entry__body { grid-column: 3; padding-left: 10px; }
     .entry__dot::before { top: 6px; }
+    .tracker, .trail { display: none; }
+    .has-tracker .entry:first-child .entry__dot::before { background: var(--accent); border-color: var(--accent); }
+    .entry.is-past .entry__dot::before { background: #fff; }
     .entry ul.logos { margin-top: 6px; gap: 6px 16px; } .logos img { height: calc(var(--h, 24px) * .42); max-width: 64px; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
@@ -220,6 +230,41 @@
       </li>
     </ol>
   </main>
+  <script>
+    // Moves one dot down the timeline with the scroll; it settles on the dot beside each year in turn.
+    (() => {
+      const tl = document.querySelector('.timeline');
+      if (!tl) return;
+      const entries = [...tl.querySelectorAll('.entry')];
+      const dots = entries.map(e => e.querySelector('.entry__dot'));
+      const make = cls => { const li = document.createElement('li'); li.className = cls; li.setAttribute('aria-hidden', 'true'); return li; };
+      tl.append(make('trail'), make('tracker')); // appended so .entry:first-child still means the first role
+      tl.classList.add('has-tracker');
+      let queued = false;
+      const update = () => {
+        queued = false;
+        const top = tl.getBoundingClientRect().top;
+        const ys = dots.map(d => d.getBoundingClientRect().top - top + 20); // centre of each stop's dot
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+        // The reading line drifts from 35% to 85% of the screen, so the last stop is reached at the bottom.
+        // The dot settles on the last year the reading line has passed.
+        const read = innerHeight * (0.35 + 0.5 * p) - top;
+        let active = 0;
+        ys.forEach((y, i) => { if (y <= read) active = i; });
+        const y = Math.round(ys[active]);
+        tl.style.setProperty("--y", y + "px");
+        tl.style.setProperty("--trail", Math.max(0, y - 10) + "px");
+        entries.forEach((e, i) => e.classList.toggle("is-past", i < active));
+      };
+      const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+      addEventListener('scroll', queue, { passive: true });
+      addEventListener('resize', queue);
+      document.fonts && document.fonts.ready.then(queue);
+      addEventListener('load', queue);
+      update();
+    })();
+  </script>
 
 </body>
 </html>
